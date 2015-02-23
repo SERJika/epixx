@@ -23,38 +23,27 @@ class paginator
         ($this->pageNumber != 1) ? $this->firstNews = $this->newsPerPage * $this->pageNumber - $this->newsPerPage : $this->firstNews = 0; 
         //$this->preNewsOnPage = $this->pdo->prepare("SELECT * FROM `news` LIMIT :firstNews, :newsPerPage");
         //$this->preNewsOnPage = $this->pdo->prepare("SELECT * FROM `news` LIMIT :firstNews, :newsPerPage");
-        
-		//var_dump($this->preNewsOnPage);
-        
-		//$this->preNewsOnPage->bindParam(':firstNews', $this->firstNews, PDO::PARAM_INT);
+        //$this->preNewsOnPage->bindParam(':firstNews', $this->firstNews, PDO::PARAM_INT);
         //$this->preNewsOnPage->bindParam(':newsPerPage', $this->newsPerPage, PDO::PARAM_INT);
-        echo "firstNews $this->firstNews<br />";
-        echo "newsPerPage $this->newsPerPage <br />";
-        //var_dump($this->preNewsOnPage);
         //$this->preNewsOnPage->execute();
         //$this->newsOnPage = $this->preNewsOnPage->fetchAll();
-        //$this->preNewsOnPage = $this->pdo->query("SELECT * FROM `news` LIMIT $this->firstNews, $this->newsPerPage");
     }
 
     public function renderPaginator()
     {
-    	for ($i = 1; $i <= $this->numberOfPages; $i++) {
+        for ($i = 1; $i <= $this->numberOfPages; $i++) {
             echo '<a href="?page=' . $i . '&on_page=' .  $this->newsPerPage  . '">' . $i . ' </a>';
         }
     }
 
     public function prepairContent()
     {
-        var_dump($this->pdo);
-		$t=$this->pdo;
-		$y=$this->preNewsOnPage;
-		$y = $t->prepare("SELECT * FROM `news` LIMIT $this->firstNews, $this->newsPerPage");
-        $y->bindParam(':firstNews', $this->firstNews, PDO::PARAM_INT);
-        $y->bindParam(':newsPerPage', $this->newsPerPage, PDO::PARAM_INT);        
-        $y->execute();
-        $this->newsOnPage = $y->fetchAll();
+        $this->preNewsOnPage = $this->pdo->prepare("SELECT * FROM `news` LIMIT $this->firstNews, $this->newsPerPage");
+        $this->preNewsOnPage->bindParam(':firstNews', $this->firstNews, PDO::PARAM_INT);
+        $this->preNewsOnPage->bindParam(':newsPerPage', $this->newsPerPage, PDO::PARAM_INT);        
+        $this->preNewsOnPage->execute();
+        $this->newsOnPage = $this->preNewsOnPage->fetchAll();
         var_dump($this->newsOnPage);
-        
     }
 }
 
@@ -70,7 +59,6 @@ $opt_db = array(
 );
 $pdo = new PDO("mysql:host=$host;dbname=$db;charset=$charset", $user_db, $pass_db, $opt_db);
 
-// var_dump($pdo);
 
 (!empty($_GET['page'])) ? $pageNumber = $_GET['page'] : $pageNumber = 1;
 (!empty($_GET['on_page'])) ? $newsPerPage = $_GET['on_page'] : $newsPerPage = 1;
@@ -80,7 +68,6 @@ echo '<input type="text" name="on_page">';
 echo '<input type="hidden" name="page" value="' . $pageNumber . '">';
 echo '<input type="submit" value="OK">';
 echo '</form>';
-
 
 
 $newPage = new paginator($pdo, $newsPerPage, $pageNumber);
@@ -93,13 +80,13 @@ foreach ($newPage->newsOnPage as $value) {
 class ulMenu extends paginator
 {
     public function renderPaginator()
-	{
-	    echo '<ul>';
-		for ($i = 1; $i <= $this->numberOfPages; $i++) {
-		    echo '<li><a href="?page=' . $i . '&on_page=' .  $this->newsPerPage  . '">' . $i . ' </a></li>';
-		}
-		echo '</ul>';
-	}
+    {
+        echo '<ul>';
+        for ($i = 1; $i <= $this->numberOfPages; $i++) {
+            echo '<li><a href="?page=' . $i . '&on_page=' .  $this->newsPerPage  . '">' . $i . ' </a></li>';
+        }
+        echo '</ul>';
+    }
 }
 $newUlMenu = new ulMenu($pdo, $newsPerPage, $pageNumber);
 $newUlMenu->renderPaginator();
@@ -111,13 +98,13 @@ foreach ($newUlMenu->newsOnPage as $value) {
 class tableMenu extends paginator
 {
     public function renderPaginator()
-	{
-	    echo '<table><tr>';
-		for ($i = 1; $i <= $this->numberOfPages; $i++) {
-		    echo '<td style="border: 1px solid black;"><a href="?page=' . $i . '&on_page=' .  $this->newsPerPage  . '">' . $i . ' </a></td>';
-		}
-		echo '</tr></table>';
-	}
+    {
+        echo '<table><tr>';
+        for ($i = 1; $i <= $this->numberOfPages; $i++) {
+            echo '<td style="border: 1px solid black;"><a href="?page=' . $i . '&on_page=' .  $this->newsPerPage  . '">' . $i . ' </a></td>';
+        }
+        echo '</tr></table>';
+    }
 }
 $newTableMenu = new tableMenu($pdo, $newsPerPage, $pageNumber);
 $newTableMenu->renderPaginator();
@@ -128,7 +115,8 @@ foreach ($newTableMenu->newsOnPage as $value) {
 
 
 
-/*
+/*  Имеет ли смысл делать такие конструкции?
+
 if( !$this->preNewsOnPage = $this->pdo->prepare("SELECT * FROM `news` LIMIT :firstNews, :newsPerPage") ) {
             echo 'Error: ' . $this->pdo->error;
             return false; // throw exception, die(), exit, whatever...
